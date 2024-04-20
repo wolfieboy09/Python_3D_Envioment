@@ -43,7 +43,7 @@ def frame_buffer_size_callback(window, width, height):  # noqa comment
 
 
 # Function to draw the cube
-def drawFromJSON(filename):
+def draw_from_files(filename):
     global camera_x, camera_y, camera_z
 
     if filename.endswith('.json'):
@@ -51,24 +51,21 @@ def drawFromJSON(filename):
         with open(filename, 'r') as data_file:
             data = json.load(data_file)
 
-        glLoadIdentity()
-        gluLookAt(camera_x, camera_y, camera_z, 0, 0, 0, 0, 1, 0)
-        INIT_DATA = data['init']
-        TRANSLATE_CORDS = INIT_DATA['insert_at']
-        glTranslatef(TRANSLATE_CORDS[0], TRANSLATE_CORDS[1], TRANSLATE_CORDS[2])
-
-        glBegin(GL_QUADS)
-        for face in INIT_DATA['access']:
-            currAt = data['faces'][face]
-            glColor3f(currAt['color'][0], currAt['color'][1], currAt['color'][2])
-            for step in currAt['steps']:
-                glVertex3f(step[0], step[1], step[2])
-        glEnd()
+        # Draw cube from JSON data
+        # ...
 
     elif filename.endswith('.obj'):
-        # Load cube data from OBJ file
-        # Parse the .obj file and draw the cube using the data
-        pass
+        vertices, faces = load_obj(filename)
+        if vertices and faces:
+            glLoadIdentity()
+            gluLookAt(camera_x, camera_y, camera_z, 0, 0, 0, 0, 1, 0)
+
+            glBegin(GL_TRIANGLES)
+            for face in faces:
+                for vertex_index in face:
+                    vertex = vertices[vertex_index]
+                    glVertex3f(*vertex)
+            glEnd()
 
 
 def load_obj(filename):
@@ -165,11 +162,11 @@ def main():
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
 
         # Get list of JSON files in the "objects" directory
-        objects = [f for f in os.listdir("objects") if f.endswith('.json')]
+        objects = [f for f in os.listdir("objects") if f.endswith('.json') or f.endswith('.obj')]
 
         try:
             for fObject in objects:
-                drawFromJSON(f"objects/{fObject}")
+                draw_from_files(f"objects/{fObject}")
         except Exception as ERROR:
             logger.error(ERROR)
         else:
