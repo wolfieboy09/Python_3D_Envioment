@@ -52,7 +52,7 @@ def draw_cube(filename):
     glLoadIdentity()
     gluLookAt(camera_x, camera_y, camera_z, 0, 0, 0, 0, 1, 0)
     INIT_DATA = data['init']
-    TRANSLATE_CORDS = INIT_DATA['put']
+    TRANSLATE_CORDS = INIT_DATA['insert_at']
     glTranslatef(TRANSLATE_CORDS[0], TRANSLATE_CORDS[1], TRANSLATE_CORDS[2])
 
     glBegin(GL_QUADS)

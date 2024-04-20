@@ -1,6 +1,6 @@
 {
   "init": {
-    "put": [0.0, 0.0, 0.0],
+    "insert_at": [0.0, 0.0, 0.0],
     "access": ["front", "back", "top", "bottom", "right", "left"]
   },
     "faces": {
