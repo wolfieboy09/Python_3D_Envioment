@@ -2,7 +2,7 @@ import math
 import glfw
 import json
 import os
-import internal.logger as logger
+import internal.logger as logger # another class I created
 from OpenGL.GL import *
 from OpenGL.GLU import *
 
@@ -43,25 +43,50 @@ def frame_buffer_size_callback(window, width, height):  # noqa comment
 
 
 # Function to draw the cube
-def draw_cube(filename):
+def drawFromJSON(filename):
     global camera_x, camera_y, camera_z
 
-    with open(filename, 'r') as data_file:
-        data = json.load(data_file)
+    if filename.endswith('.json'):
+        # Load cube data from JSON
+        with open(filename, 'r') as data_file:
+            data = json.load(data_file)
 
-    glLoadIdentity()
-    gluLookAt(camera_x, camera_y, camera_z, 0, 0, 0, 0, 1, 0)
-    INIT_DATA = data['init']
-    TRANSLATE_CORDS = INIT_DATA['insert_at']
-    glTranslatef(TRANSLATE_CORDS[0], TRANSLATE_CORDS[1], TRANSLATE_CORDS[2])
+        glLoadIdentity()
+        gluLookAt(camera_x, camera_y, camera_z, 0, 0, 0, 0, 1, 0)
+        INIT_DATA = data['init']
+        TRANSLATE_CORDS = INIT_DATA['insert_at']
+        glTranslatef(TRANSLATE_CORDS[0], TRANSLATE_CORDS[1], TRANSLATE_CORDS[2])
 
-    glBegin(GL_QUADS)
-    for face in INIT_DATA['access']:
-        currAt = data['faces'][face]
-        glColor3f(currAt['color'][0], currAt['color'][1], currAt['color'][2])
-        for step in currAt['steps']:
-            glVertex3f(step[0], step[1], step[2])
-    glEnd()
+        glBegin(GL_QUADS)
+        for face in INIT_DATA['access']:
+            currAt = data['faces'][face]
+            glColor3f(currAt['color'][0], currAt['color'][1], currAt['color'][2])
+            for step in currAt['steps']:
+                glVertex3f(step[0], step[1], step[2])
+        glEnd()
+
+    elif filename.endswith('.obj'):
+        # Load cube data from OBJ file
+        # Parse the .obj file and draw the cube using the data
+        pass
+
+
+def load_obj(filename):
+    vertices = []
+    faces = []
+
+    with open(filename, 'r') as obj_file:
+        for line in obj_file:
+            if line.startswith('v '):
+                # Parse vertex position
+                vertex = list(map(float, line.strip().split()[1:]))
+                vertices.append(vertex)
+            elif line.startswith('f '):
+                # Parse face indices
+                face = [int(vertex.split('/')[0]) - 1 for vertex in line.strip().split()[1:]]
+                faces.append(face)
+
+    return vertices, faces
 
 
 # Function to update the rotation angles and camera position
@@ -144,7 +169,7 @@ def main():
 
         try:
             for fObject in objects:
-                draw_cube(f"objects/{fObject}")
+                drawFromJSON(f"objects/{fObject}")
         except Exception as ERROR:
             logger.error(ERROR)
         else:
