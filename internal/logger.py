@@ -12,7 +12,6 @@ COLORS = {
 }
 
 
-# Define functions for each logging level with colored output
 def debug(msg):
     sys.stdout.write(f"{COLORS['CYAN']}[DEBUG] {msg}{COLORS['RESET']}\n")
 
