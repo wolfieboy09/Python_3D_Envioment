@@ -51,8 +51,19 @@ def draw_from_files(filename):
         with open(filename, 'r') as data_file:
             data = json.load(data_file)
 
-        # Draw cube from JSON data
-        # ...
+        glLoadIdentity()
+        gluLookAt(camera_x, camera_y, camera_z, 0, 0, 0, 0, 1, 0)
+        INIT_DATA = data['init']
+        TRANSLATE_CORDS = INIT_DATA['insert_at']
+        glTranslatef(TRANSLATE_CORDS[0], TRANSLATE_CORDS[1], TRANSLATE_CORDS[2])
+
+        glBegin(GL_QUADS)
+        for face in INIT_DATA['access']:
+            currAt = data['faces'][face]
+            glColor3f(currAt['color'][0], currAt['color'][1], currAt['color'][2])
+            for step in currAt['steps']:
+                glVertex3f(step[0], step[1], step[2])
+        glEnd()
 
     elif filename.endswith('.obj'):
         vertices, faces = load_obj(filename)
@@ -97,8 +108,7 @@ def doCameraUpdateAndThings():
     camera_dir_y = math.sin(math.radians(camera_pitch))
     camera_dir_z = math.sin(math.radians(camera_yaw)) * math.cos(math.radians(camera_pitch))
 
-    # Normalize camera direction (it does not work)
-    camera_dir_length = math.sqrt(camera_dir_x ** 2 + camera_dir_y ** 2 + camera_dir_z ** 2)
+    camera_dir_length = math.hypot(camera_dir_x ** 2 + camera_dir_y ** 2 + camera_dir_z ** 2)
     camera_dir_x /= camera_dir_length
     camera_dir_y /= camera_dir_length
     camera_dir_z /= camera_dir_length
