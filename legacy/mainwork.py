@@ -156,7 +156,6 @@ def load_mil(filename):
 def camera_updating(window):  # noqa
     global angle_x, angle_y, camera_x, camera_y, camera_z, camera_yaw, camera_pitch
 
-    # Update camera direction
     camera_dir_x = math.cos(math.radians(camera_yaw)) * math.cos(math.radians(camera_pitch))
     camera_dir_y = math.sin(math.radians(camera_pitch))
     camera_dir_z = math.sin(math.radians(camera_yaw)) * math.cos(math.radians(camera_pitch))
@@ -166,7 +165,6 @@ def camera_updating(window):  # noqa
     camera_dir_y /= camera_dir_length
     camera_dir_z /= camera_dir_length
 
-    # Update camera position
     speed = 0.01
     if glfw.get_key(window, glfw.KEY_W) == glfw.PRESS:
         camera_x += speed * camera_dir_x
@@ -177,7 +175,6 @@ def camera_updating(window):  # noqa
         camera_y -= speed * camera_dir_y
         camera_z -= speed * camera_dir_z
 
-    # Keyboard controls for camera rotation
     rotation_speed = 0.5
     if glfw.get_key(window, glfw.KEY_LEFT) == glfw.PRESS:
         camera_yaw += rotation_speed
@@ -188,7 +185,6 @@ def camera_updating(window):  # noqa
     if glfw.get_key(window, glfw.KEY_DOWN) == glfw.PRESS:
         camera_pitch -= rotation_speed
 
-    # Clamp camera pitch to avoid flipping
     camera_pitch = max(-90.0, min(90.0, camera_pitch))
 
 
@@ -205,13 +201,11 @@ def load_texture(texture_path):
     texture_id = glGenTextures(1)
     glBindTexture(GL_TEXTURE_2D, texture_id)
 
-    # Set texture parameters
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT)
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT)
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR)
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR)
 
-    # Load texture data
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, img_data)
     textures[texture_path] = texture_id
 
@@ -222,23 +216,18 @@ def load_texture(texture_path):
 def main():
     global window  # noqa
 
-    # Initialize GLFW
     if not glfw.init():
         return
 
-    # Create a windowed mode window and its OpenGL context
     window = glfw.create_window(800, 600, "3D Rendering", None, None)
     if not window:
         logger.warning("Terminating Window")
         glfw.terminate()
         return
 
-    # Make the window's context current
     glfw.make_context_current(window)
     glfw.set_framebuffer_size_callback(window, frame_buffer_size_callback)
     init()
-
-    # Loop until the user closes the window
 
     while not glfw.window_should_close(window):
         # Render here
@@ -251,14 +240,8 @@ def main():
                 draw_from_files(f"objects/{fObject}")
         except FileNotFoundError as FileChangeError:
             logger.error(FileChangeError)
-
-        # Update rotation angles and camera position
         camera_updating(window)
-
-        # Swap front and back buffers
         glfw.swap_buffers(window)
-
-        # Poll for and process events
         glfw.poll_events()
 
     logger.info("Terminating window")
